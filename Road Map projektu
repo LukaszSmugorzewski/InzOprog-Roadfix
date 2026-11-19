@@ -149,3 +149,63 @@ Cel: Zwiększenie komfortu kierowcy poprzez pokazanie realnego czasu i trasy doj
 Zmiany w widokach: Dodanie interaktywnej mapy w W03; dodanie nowego prostego widoku W05 (ekran kierowcy lawety do udostępniania lokalizacji).
 Zmiany w danych: Nowa tabela Laweta (id PK, nr_rejestracyjny, aktualne_gps, ostatnia_aktualizacja) powiązana kluczem obcym ze Zgloszenie.
 Zmiany w funkcjonalnościach: Dodanie nowej roli użytkownika (Kierowca lawety) oraz funkcji okresowego wysyłania współrzędnych GPS i renderowania ich na mapie w W03.
+
+1. Dodawanie zdjęć uszkodzonego pojazdu lub sytuacji na drodze (F06)
+
+    Cel: Ułatwienie dyspozytorowi oceny skali awarii i doboru odpowiedniego sprzętu (np. lawety z wyciągarką lub z niskim najazdem) jeszcze przed wysłaniem pojazdu, co ogranicza ryzyko pomyłki i przyspiesza realizację pomocy.
+
+    Zmiany w widokach:
+
+        W02 (Formularz wezwania pomocy): dodanie opcjonalnego pola/przycisku do załączenia zdjęć z aparatu lub galerii wraz z ich podglądem przed wysłaniem.
+
+        W04 (Panel dyspozytora): dodanie sekcji z miniaturami i powiększeniem załączonych zdjęć w szczegółach aktywnego zgłoszenia.
+
+        W01, W03: brak zmian.
+
+    Zmiany w danych:
+
+        Nowa tabela Zdjecie (id PK, zgloszenie_id FK, sciezka_pliku, data_dodania) w relacji 1:N z tabelą Zgłoszenie (po zamknięciu lub odrzuceniu zgłoszenia pliki i rekordy są usuwane w ramach anonimizacji danych wrażliwych).
+
+    Zmiany w funkcjonalnościach:
+
+        Dodanie walidacji rozmiaru i formatu przesyłanych plików graficznych, zapisu zdjęć na serwerze, ich wyświetlania dyspozytorowi oraz automatycznego usuwania po zmianie statusu na Zakończone lub Odrzucone.
+
+2. Śledzenie pozycji jadącej lawety na mapie w czasie rzeczywistym (F07)
+
+    Cel: Zwiększenie komfortu psychicznego kierowcy oczekującego na pomoc – zamiast ogólnego statusu Laweta w drodze użytkownik widzi realny postęp dojazdu i szacowany czas oczekiwania.
+
+    Zmiany w widokach:
+
+        W03 (Ekran statusu zgłoszenia): dodanie interaktywnej mapy z pinezką użytkownika oraz aktualizowaną na żywo ikoną przypisanej lawety (widoczna wyłącznie przy statusie Laweta w drodze).
+
+        Nowy widok W05 (Widok terminala kierowcy lawety): prosty ekran pozwalający kierowcy lawety włączyć/wyłączyć udostępnianie swojej lokalizacji GPS (opcjonalnie, jeśli nie jest używany zewnętrzny moduł GPS).
+
+        W01, W02, W04: brak zmian (w W04 mapa nie jest wymagana na tym etapie).
+
+    Zmiany w danych:
+
+        Rozszerzenie tabeli Laweta o pola aktualna_szerokosc_gps (liczba), aktualna_dlugosc_gps (liczba) oraz ostatnia_aktualizacja_gps (data i godzina).
+
+    Zmiany w funkcjonalnościach:
+
+        Cykliczne przesyłanie współrzędnych GPS z lawety do serwera oraz pobieranie ich w aplikacji mobilnej użytkownika i renderowanie trasy/pozycji na mapie.
+
+3. Płatności bezgotówkowe w aplikacji po zakończeniu usługi (F08)
+
+    Cel: Usprawnienie rozliczenia usługi na drodze bez konieczności posiadania gotówki lub terminala płatniczego u kierowcy lawety.
+
+    Zmiany w widokach:
+
+        W03 (Ekran statusu zgłoszenia): dodanie podsumowania kosztu i przycisku „Opłać usługę” pojawiającego się po zakończeniu realizacji zlecenia.
+
+        W04 (Panel dyspozytora): dodanie pola do wpisania kwoty usługi przed jej zamknięciem oraz wskaźnika statusu płatności.
+
+        W01, W02: brak zmian.
+
+    Zmiany w danych:
+
+        Nowa tabela Platnosc (id PK, zgloszenie_id FK, kwota, status_platnosci, data_platnosci) powiązana w relacji 1:1 z tabelą Zgłoszenie (dane samej karty przechowywane są wyłącznie po stronie zewnętrznego operatora płatności).
+
+    Zmiany w funkcjonalnościach:
+
+        Integracja z zewnętrzną bramką płatniczą (np. Stripe/Przelewy24), wystawianie kwoty do zapłaty przez dyspozytora oraz obsługa potwierdzenia płatności w aplikacji kierowcy.
