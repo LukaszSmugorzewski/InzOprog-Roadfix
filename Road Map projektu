@@ -1,0 +1,21 @@
+
+1. Cel i granice wersji v1
+-Tytuł projektu: Roadfix – aplikacja mobilna dla kierowców do szybszego wzywania pomocy drogowej.
+-Główny odbiorca: Kierowcy samochodów osobowych potrzebujący pomocy technicznej na drodze.
+-Główny cel v1: Umożliwienie kierowcy szybkiego wysłania zgłoszenia awarii z lokalizacją i danymi auta oraz zapewnienie dyspozytorowi możliwości jego obsługi.
+
+Efekt dla użytkownika w v1:
+W pierwszej wersji kierowca zakłada konto przypisane do numeru telefonu i w razie awarii wysyła zgłoszenie kilkoma kliknięciami, bez konieczności szukania numeru do pomocy drogowej. 
+System pobiera jego lokalizację GPS lub pozwala wpisać adres ręcznie, a także zbiera podstawowe dane pojazdu ułatwiające identyfikację.
+Dyspozytor natychmiast widzi zgłoszenie w swoim panelu webowym i zmienia jego status np. na Przyjęte lub Laweta w drodze. 
+Dzięki temu kierowca ma pewność, że pomoc została wezwana i zna bieżący etap realizacji swojego zgłoszenia.
+
+Wybrane funkcje MVP (v1): F01, F02, F03, F04, F05.   
+
+Odłożone do kolejnych iteracji (v2+): 
+-F06 (dodawanie zdjęć zdarzenia), 
+-F07 (śledzenie lawety na mapie), 
+-F08 (płatności kartą w aplikacji). 
+
+2. Widoki
+
