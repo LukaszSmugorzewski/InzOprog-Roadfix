@@ -135,3 +135,17 @@ F05 – Podgląd bieżącego statusu zgłoszenia i komunikatów
     Warunek potwierdzający: Status i komunikaty widoczne w W03 są zgodne z aktualnym stanem rekordu w tabeli Zgłoszenie.
 
     Sytuacja błędna / ograniczenie: Brak połączenia z internetem podczas odświeżania – aplikacja zachowuje ostatni pobrany status na ekranie i wyświetla komunikat o braku sieci z opcją ręcznego ponowienia próby.
+
+6. Kierunek kolejnej iteracji – v2
+
+Dodawanie zdjęć uszkodzeń (F06)
+Cel: Ułatwienie dyspozytorowi oceny skali awarii i doboru odpowiedniego sprzętu (np. lawety z dźwigiem).
+Zmiany w widokach: Dodanie przycisku „Dodaj zdjęcie” w W02 oraz podglądu miniaturki zdjęcia w W04.
+Zmiany w danych: Nowa tabela Zdjecie (id PK, zgloszenie_id FK, sciezka_pliku, data_dodania) w relacji 1:N ze Zgloszenie.
+Zmiany w funkcjonalnościach: Rozszerzenie F03 o przesyłanie plików graficznych (opcjonalne) oraz mechanizm usuwania/anonimizacji zdjęć po zakończeniu usługi.
+
+Śledzenie położenia lawety na mapie (F07)
+Cel: Zwiększenie komfortu kierowcy poprzez pokazanie realnego czasu i trasy dojazdu pomocy.
+Zmiany w widokach: Dodanie interaktywnej mapy w W03; dodanie nowego prostego widoku W05 (ekran kierowcy lawety do udostępniania lokalizacji).
+Zmiany w danych: Nowa tabela Laweta (id PK, nr_rejestracyjny, aktualne_gps, ostatnia_aktualizacja) powiązana kluczem obcym ze Zgloszenie.
+Zmiany w funkcjonalnościach: Dodanie nowej roli użytkownika (Kierowca lawety) oraz funkcji okresowego wysyłania współrzędnych GPS i renderowania ich na mapie w W03.
