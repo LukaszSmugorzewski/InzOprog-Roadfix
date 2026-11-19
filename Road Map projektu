@@ -57,3 +57,81 @@ Dane wprowadzane: Wybór nowego statusu z listy, wpisanie numeru/nazwy przypisan
 Dane wyświetlane: Pasek górny z przyciskiem „Wyloguj”, tabela/lista aktywnych zgłoszeń (numer telefonu kierowcy, współrzędne GPS lub ręczny adres, dane auta, aktualny status) oraz przyciski zapisu zmian przy każdym wierszu.   
 Po poprawnym działaniu: Zmiana zapisuje się w bazie i wyskakuje komunikat „Zaktualizowano status zgłoszenia”. Po ustawieniu „Zakończone” lub „Odrzucone” zgłoszenie znika z listy aktywnych (dane wrażliwe nie są już widoczne).  
 Po błędzie: Próba ustawienia statusu „Odrzucone” bez wpisania powodu blokuje zapis i pokazuje komunikat „Wpisz powód odrzucenia zgłoszenia”.
+
+
+| :--- | :--- |
+| **Użytkownik** | `id` (PK, liczba), `numer_telefonu` (tekst), `email` (tekst), `haslo_hash` (tekst), `czy_zweryfikowany` (wartość logiczna), `data_utworzenia` (data i godzina) |
+| **Dyspozytor** | `id` (PK, liczba), `login` (tekst), `haslo_hash` (tekst), `imie_nazwisko` (tekst) |
+| **Laweta** | `id` (PK, liczba), `nr_rejestracyjny` (tekst), `opis_pojazdu` (tekst), `czy_dostepna` (wartość logiczna) |
+| **Zgłoszenie** | `id` (PK, liczba), `uzytkownik_id` (FK, liczba), `dyspozytor_id` (FK, liczba – opcjonalny), `laweta_id` (FK, liczba – opcjonalny), `szerokosc_gps` (liczba), `dlugosc_gps` (liczba), `adres_reczny` (tekst), `marka_pojazdu` (tekst), `kolor_pojazdu` (tekst), `nr_rejestracyjny_pojazdu` (tekst), `status` (tekst), `powod_odrzucenia` (tekst), `data_utworzenia` (data i godzina), `data_zakonczenia` (data i godzina) |
+
+
+F01 – Rejestracja i logowanie użytkownika
+
+    Użytkownik: Kierowca samochodu osobowego.
+
+    Powiązany widok: W01 (Ekran rejestracji i logowania).
+
+    Potrzebne dane: numer_telefonu, email, haslo_hash, czy_zweryfikowany (tabela Użytkownik).
+
+    Oczekiwane działanie: Użytkownik w W01 podaje numer telefonu, adres e-mail oraz hasło, a następnie potwierdza numer kodem weryfikacyjnym. System zapisuje rekord w tabeli Użytkownik (ustawiając czy_zweryfikowany = true) i po zalogowaniu przenosi użytkownika do W02.
+
+    Warunek potwierdzający: Numer telefonu ma poprawny format, nie istnieje jeszcze w bazie, a kod weryfikacyjny jest poprawny.
+
+    Sytuacja błędna / ograniczenie: Próba rejestracji na już zajęty numer telefonu lub wpisanie błędnego kodu weryfikacyjnego – system blokuje utworzenie konta i wyświetla odpowiedni komunikat.
+
+F02 – Udostępnienie lokalizacji zdarzenia (GPS lub adres ręczny)
+
+    Użytkownik: Kierowca samochodu osobowego.
+
+    Powiązany widok: W02 (Formularz wezwania pomocy).
+
+    Potrzebne dane: szerokosc_gps, dlugosc_gps, adres_reczny (tabela Zgłoszenie).
+
+    Oczekiwane działanie: Po uruchomieniu formularza w W02 aplikacja automatycznie pobiera współrzędne GPS z urządzenia. Jeśli sygnał jest niedostępny lub użytkownik odmówi dostępu do lokalizacji, wpisuje adres ręcznie. Dane są przygotowane do zapisu w tabeli Zgłoszenie.
+
+    Warunek potwierdzający: Zgłoszenie zawiera poprawne współrzędne GPS albo niepusty tekst w polu adres_reczny.
+
+    Sytuacja błędna / ograniczenie: Brak dostępu do GPS przy jednoczesnym pozostawieniu pustego pola adresu – system blokuje przejście dalej i informuje o konieczności podania lokalizacji.
+
+F03 – Podanie danych pojazdu i wysłanie zgłoszenia
+
+    Użytkownik: Kierowca samochodu osobowego.
+
+    Powiązany widok: W02 (Formularz wezwania pomocy) oraz W03 (Ekran statusu zgłoszenia).
+
+    Potrzebne dane: uzytkownik_id, marka_pojazdu, kolor_pojazdu, nr_rejestracyjny_pojazdu, status, data_utworzenia (tabela Zgłoszenie).
+
+    Oczekiwane działanie: Użytkownik w W02 wpisuje markę, kolor oraz numer rejestracyjny auta i zatwierdza wezwanie. System zapisuje nowy rekord w tabeli Zgłoszenie ze statusem Oczekujące na dyspozytora i przekierowuje użytkownika do W03.
+
+    Warunek potwierdzający: Wszystkie dane pojazdu są wypełnione, a użytkownik nie ma innego aktywnego zgłoszenia w bazie.
+
+    Sytuacja błędna / ograniczenie: Użytkownik posiada już aktywne zgłoszenie (status inny niż Zakończone lub Odrzucone) – system blokuje utworzenie kolejnego rekordu (ochrona przed spamem) i wyświetla komunikat z przekierowaniem do bieżącego zgłoszenia w W03.
+
+F04 – Obsługa zgłoszenia i zarządzanie statusem przez dyspozytora
+
+    Użytkownik: Dyspozytor.
+
+    Powiązany widok: W04 (Panel webowy dyspozytora – lista i szczegóły zgłoszenia).
+
+    Potrzebne dane: id, dyspozytor_id, laweta_id, status, powod_odrzucenia, data_zakonczenia (tabela Zgłoszenie), czy_dostepna (tabela Laweta).
+
+    Oczekiwane działanie: Dyspozytor odbiera zgłoszenie w W04, zmienia jego status na Przyjęte (zapis dyspozytor_id), a następnie przypisuje wolną lawetę (status Laweta w drodze, zapis laweta_id) lub kolejkuje je jako Oczekujące na sprzęt. Na koniec zamyka zgłoszenie jako Zakończone lub Odrzucone (z podaniem powodu), co uruchamia anonimizację danych wrażliwych w rekordzie.
+
+    Warunek potwierdzający: Nowy status zostaje zapisany w tabeli Zgłoszenie, a przy przypisywaniu lawety jej pole czy_dostepna ma wartość true.
+
+    Sytuacja błędna / ograniczenie: Próba odrzucenia zgłoszenia bez wypełnienia pola powod_odrzucenia lub próba przypisania już zajętej lawety – system blokuje zapis i wyświetla komunikat walidacyjny.
+
+F05 – Podgląd bieżącego statusu zgłoszenia i komunikatów
+
+    Użytkownik: Kierowca samochodu osobowego.
+
+    Powiązany widok: W03 (Ekran statusu aktywnego zgłoszenia).
+
+    Potrzebne dane: status, powod_odrzucenia, data_utworzenia (tabela Zgłoszenie dla zalogowanego uzytkownik_id).
+
+    Oczekiwane działanie: Użytkownik w W03 widzi aktualny etap realizacji swojego zgłoszenia (np. Przyjęte, Oczekujące na sprzęt, Laweta w drodze) oraz dodatkowe komunikaty od dyspozytora (w tym powód ewentualnego odrzucenia). Widok aktualizuje się po zmianach w bazie.
+
+    Warunek potwierdzający: Status i komunikaty widoczne w W03 są zgodne z aktualnym stanem rekordu w tabeli Zgłoszenie.
+
+    Sytuacja błędna / ograniczenie: Brak połączenia z internetem podczas odświeżania – aplikacja zachowuje ostatni pobrany status na ekranie i wyświetla komunikat o braku sieci z opcją ręcznego ponowienia próby.
