@@ -1,7 +1,7 @@
 
 1. Cel i granice wersji v1
 -Tytuł projektu: Roadfix – aplikacja mobilna dla kierowców do szybszego wzywania pomocy drogowej.
--Główny odbiorca: Kierowcy samochodów osobowych potrzebujący pomocy technicznej na drodze.
+-Główny odbiorca: Kierowcy samochodów osobowych potrzebujący pomocy technicznej na drodze oraz dyspozytorzy firmy pomocy drogowej.
 -Główny cel v1: Umożliwienie kierowcy szybkiego wysłania zgłoszenia awarii z lokalizacją i danymi auta oraz zapewnienie dyspozytorowi możliwości jego obsługi.
 
 Efekt dla użytkownika w v1:
@@ -17,5 +17,43 @@ Odłożone do kolejnych iteracji (v2+):
 -F07 (śledzenie lawety na mapie), 
 -F08 (płatności kartą w aplikacji). 
 
-2. Widoki
+2. widoki wstęp
 
+Widok                              Potrzebne dane                          Funkcjonalność
+W01 Logowanie i rejestracja        Użytkownik                              F01 Rejestracja i logowanie numerem telefonu.
+W02 Formularz wezwania pomocy      Użytkownik, Zgłoszenie                  F02 Podanie lokalizacji (GPS/ręcznie), F03 Wysłanie danych pojazdu.
+W03 Status aktywnego zgłoszenia    Zgłoszenie                              F05 Podgląd aktualnego statusu i komunikatów.
+W04 Panel dyspozytora              Użytkownik, Dyspozytor, Zgłoszenie      F04 Odbiór zgłoszenia, przypisanie lawety i zmiana statusu.
+
+3. widoki
+
+W01 – Ekran logowania i rejestracji
+Kto korzysta i po co: Kierowca – żeby założyć konto na swój numer telefonu albo zalogować się do aplikacji przed wezwaniem pomocy.   
+Dane wprowadzane: Numer telefonu (login), e-mail (tylko przy rejestracji, do kontaktu), hasło oraz kod weryfikacyjny SMS.   
+Dane wyświetlane: Logo Roadfix, przełącznik „Logowanie / Rejestracja”, pola formularza i przycisk zatwierdzający.   
+Po poprawnym działaniu: Aplikacja przenosi kierowcę do formularza zgłoszenia (W02) albo od razu do ekranu statusu (W03), jeśli ma już aktywne wezwanie.   
+Po błędzie: Wyświetla się czerwony komunikat pod formularzem, np. „Błędny numer telefonu lub hasło”, „Kod SMS jest nieprawidłowy” albo „Konto na ten numer już istnieje”.  
+
+W02 – Formularz wezwania pomocy
+Kto korzysta i po co: Kierowca – żeby szybko podać, gdzie stoi i jakim autem jedzie, a potem wysłać zgłoszenie do firmy.   
+Dane wprowadzane: Lokalizacja (pobierana automatycznie z GPS albo wpisywana ręcznie jako adres/punkt orientacyjny), marka auta, kolor, numer rejestracyjny.  
+Dane wyświetlane: Nagłówek z przyciskiem „Wyloguj”, status pobrania GPS (np. „Pobrano współrzędne” lub pole na ręczny adres), pola na dane pojazdu i duży przycisk „Wezwij pomoc”.   
+Po poprawnym działaniu: Zgłoszenie zapisuje się w bazie ze statusem „Oczekujące na dyspozytora”, a ekran automatycznie przełącza się na widok statusu (W03).  
+Po błędzie:
+-Brak zgody na GPS lub brak sygnału – komunikat „Nie udało się pobrać GPS, wpisz adres ręcznie” i odblokowanie pola tekstowego.  
+-Puste pola auta – komunikat „Uzupełnij wszystkie dane pojazdu”.   
+-Próba wysłania kolejnego zgłoszenia – komunikat „Masz już jedno aktywne zgłoszenie”.
+
+W03 – Status aktywnego zgłoszenia
+Kto korzysta i po co: Kierowca – żeby sprawdzić, na jakim etapie jest jego wezwanie i czy laweta już wyjechała.   
+Dane wprowadzane: Brak (tylko kliknięcie przycisku „Odśwież status”).   
+Dane wyświetlane: Aktualny status zgłoszenia (np. „Oczekujące na dyspozytora”, „Przyjęte”, „Oczekujące na sprzęt”, „Laweta w drodze”), podsumowanie podanych danych auta i lokalizacji, ewentualny komunikat od dyspozytora (np. powód odrzucenia) oraz przycisk „Odśwież”.   
+Po poprawnym działaniu: Po kliknięciu „Odśwież” (lub po wejściu na ekran) pokazuje się aktualny status z bazy. Gdy status zmieni się na „Zakończone” lub „Odrzucone”, pojawia się przycisk powrotu do nowego zgłoszenia (W02).   
+Po błędzie: Brak zasięgu/internetu – komunikat „Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie”.   
+
+W04 – Panel dyspozytora (widok webowy)
+Kto korzysta i po co: Dyspozytor – żeby odbierać nowe wezwania od kierowców, ręcznie przypisywać lawetę i zmieniać statusy.   
+Dane wprowadzane: Wybór nowego statusu z listy, wpisanie numeru/nazwy przypisanej lawety oraz opcjonalny powód odrzucenia.   
+Dane wyświetlane: Pasek górny z przyciskiem „Wyloguj”, tabela/lista aktywnych zgłoszeń (numer telefonu kierowcy, współrzędne GPS lub ręczny adres, dane auta, aktualny status) oraz przyciski zapisu zmian przy każdym wierszu.   
+Po poprawnym działaniu: Zmiana zapisuje się w bazie i wyskakuje komunikat „Zaktualizowano status zgłoszenia”. Po ustawieniu „Zakończone” lub „Odrzucone” zgłoszenie znika z listy aktywnych (dane wrażliwe nie są już widoczne).  
+Po błędzie: Próba ustawienia statusu „Odrzucone” bez wpisania powodu blokuje zapis i pokazuje komunikat „Wpisz powód odrzucenia zgłoszenia”.
